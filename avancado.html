@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Emoji Cipher System</title>
+    <style>
+        :root { --p: #ffdf00; --bg: #1a1a2e; --txt: #ffffff; }
+        body { background: var(--bg); color: var(--txt); font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .card { background: #16213e; padding: 25px; border-radius: 15px; width: 100%; max-width: 600px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h2 { text-align: center; color: var(--p); }
+        .config { display: flex; justify-content: space-around; margin-bottom: 15px; background: #0f3460; padding: 10px; border-radius: 8px; }
+        textarea { width: 100%; height: 80px; margin: 10px 0; border-radius: 8px; padding: 10px; font-size: 1.2rem; border: none; }
+        .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        button { padding: 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; background: var(--p); color: #000; }
+        .btn-copy { background: #4ecca3; width: 100%; margin-top: 10px; }
+        .dic { display: grid; grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); gap: 5px; margin-top: 20px; }
+        .dic-item { background: #0f3460; padding: 5px; text-align: center; border-radius: 5px; font-size: 0.8rem; }
+        .emoji-v { font-size: 1.5rem; display: block; }
+
+        /* Apenas o estilo do novo botão de navegação */
+        .btn-nav { 
+            background: transparent; 
+            color: var(--p); 
+            border: 1px solid var(--p); 
+            width: 100%; 
+            margin-bottom: 15px; 
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <button class="btn-nav" onclick="irParaSimplificado()">IR PARA CRIPTOGRAFIA SIMPLIFICADA</button>
+
+    <h2>🔐 EMOJI CIPHER</h2>
+    
+    <div class="config">
+        <span>CHAVE: <input type="number" id="key" value="50" oninput="gerarTabela()"></span>
+        <span>SALTO: <input type="number" id="step" value="2" oninput="gerarTabela()"></span>
+    </div>
+
+    <textarea id="input" placeholder="Escreva sua mensagem..."></textarea>
+    
+    <div class="btns">
+        <button onclick="handle(true)">VIRAR EMOJI ➔</button>
+        <button onclick="handle(false)" style="background: #e94560; color: white;">LER EMOJI ➔</button>
+    </div>
+
+    <textarea id="output" readonly></textarea>
+    <button class="btn-copy" onclick="copy()">COPIAR</button>
+
+    <div id="tabelaDic" class="dic"></div>
+</div>
+
+<script>
+    const BASE_EMOJI = 128512; 
+
+    function irParaSimplificado() {
+       window.location.href = 'simplificado.html'; 
+    }
+
+    function normalizar(t) {
+        return t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    }
+
+    function handle(encode) {
+        const val = document.getElementById('input').value;
+        const key = parseInt(document.getElementById('key').value) || 0;
+        const step = parseInt(document.getElementById('step').value) || 1;
+        const out = document.getElementById('output');
+
+        if (encode) {
+            out.value = normalizar(val).split('').map(c => {
+                const code = c.charCodeAt(0);
+                if (code >= 97 && code <= 122) {
+                    const pos = (code - 97) + 1;
+                    return String.fromCodePoint(BASE_EMOJI + (pos * step) + key);
+                }
+                return c;
+            }).join('');
+        } else {
+            const chars = Array.from(val); 
+            out.value = chars.map(c => {
+                const cp = c.codePointAt(0);
+                const pos = (cp - BASE_EMOJI - key) / step;
+                if (Number.isInteger(pos) && pos >= 1 && pos <= 26) {
+                    return String.fromCharCode((pos - 1) + 97);
+                }
+                return c;
+            }).join('');
+        }
+    }
+
+    function gerarTabela() {
+        const key = parseInt(document.getElementById('key').value) || 0;
+        const step = parseInt(document.getElementById('step').value) || 1;
+        const container = document.getElementById('tabelaDic');
+        container.innerHTML = '';
+
+        for (let i = 1; i <= 26; i++) {
+            const letra = String.fromCharCode(i + 96);
+            const emoji = String.fromCodePoint(BASE_EMOJI + (i * step) + key);
+            container.innerHTML += `<div class="dic-item"><span>${letra.toUpperCase()}</span><span class="emoji-v">${emoji}</span></div>`;
+        }
+    }
+
+    function copy() {
+        document.getElementById('output').select();
+        document.execCommand('copy');
+        alert("Copiado! 🚀");
+    }
+
+    gerarTabela();
+</script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cipher Portal - Escolha seu Método</title>
+    <style>
+        :root {
+            --green: #25D366;
+            --blue: #16213e;
+            --yellow: #ffdf00;
+            --dark: #075E54;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #075E54 0%, #1a1a2e 100%);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            text-align: center;
+            max-width: 800px;
+            padding: 20px;
+        }
+        h1 { font-size: 2.5rem; margin-bottom: 10px; color: var(--yellow); }
+        p.subtitle { font-size: 1.1rem; opacity: 0.8; margin-bottom: 40px; }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .option-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s, background 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .option-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.2);
+            border-color: var(--yellow);
+        }
+        .icon { font-size: 3rem; margin-bottom: 15px; }
+        .option-card h3 { margin: 10px 0; font-size: 1.5rem; }
+        .option-card p { font-size: 0.9rem; line-height: 1.4; opacity: 0.9; }
+        
+        .btn {
+            margin-top: 20px;
+            padding: 10px 25px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border: none;
+        }
+        .btn-simples { background: var(--green); color: white; }
+        .btn-avancado { background: var(--yellow); color: #000; }
+
+        @media (max-width: 600px) {
+            .menu-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🔐 Cipher System</h1>
+    <p class="subtitle">Escolha como deseja proteger suas mensagens hoje</p>
+
+    <div class="menu-grid">
+        <a href="simplificado.html" class="option-card">
+            <div class="icon">📱</div>
+            <h3>Modo Simplificado</h3>
+            <p>Ideal para chats rápidos. Usa emojis baseados no padrão do teclado do WhatsApp ou do seu celular.</p>
+            <button class="btn btn-simples">Acessar</button>
+        </a>
+
+        <a href="avancado.html" class="option-card">
+            <div class="icon">🚀</div>
+            <h3>Modo Avançado</h3>
+            <p>Segurança personalizada. Use chaves numéricas e saltos matemáticos para criar códigos únicos.</p>
+            <button class="btn btn-avancado">Acessar</button>
+        </a>
+    </div>
+</div>
+
+</body>
+</html>

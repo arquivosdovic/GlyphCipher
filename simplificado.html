@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Emoji Cipher - Multi-Teclado</title>
+    <style>
+        :root { --p: #25D366; --bg: #075E54; --card: #ffffff; }
+        body { background: var(--bg); font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .card { background: var(--card); padding: 25px; border-radius: 15px; width: 100%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        h2 { text-align: center; color: var(--bg); margin-top: 0; margin-bottom: 10px; }
+        
+        .mode-indicator { text-align: center; font-weight: bold; color: #128C7E; margin-bottom: 15px; font-size: 0.9rem; }
+        
+        textarea { width: 100%; height: 80px; margin: 10px 0; border-radius: 8px; padding: 12px; font-size: 1.1rem; border: 1px solid #ddd; box-sizing: border-box; resize: none; }
+        
+        .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        button { padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; transition: 0.2s; }
+        
+        .btn-encode { background: #25D366; color: white; }
+        .btn-decode { background: #128C7E; color: white; }
+        .btn-switch { background: #f39c12; color: white; width: 100%; margin-bottom: 5px; }
+        .btn-advanced { background: #34495e; color: white; width: 100%; margin-top: 10px; }
+        
+        .dic { display: grid; grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); gap: 8px; margin-top: 20px; border-top: 2px solid #eee; padding-top: 15px; }
+        .dic-item { text-align: center; padding: 8px 2px; background: #f1f1f1; border-radius: 6px; display: flex; flex-direction: column; align-items: center; }
+        .letra-v { font-weight: bold; color: #333; font-size: 0.8rem; }
+        .emoji-v { font-size: 1.3rem; margin: 4px 0; color: #000; }
+        .indice-v { font-weight: 800; color: #1a1a1a; font-size: 0.75rem; background: #e0e0e0; width: 100%; border-radius: 0 0 6px 6px; margin-top: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>📱 Cipher Manager</h2>
+    <div id="statusModo" class="mode-indicator">Modo: Teclado WhatsApp</div>
+    
+    <button class="btn-switch" onclick="toggleKeyboard()">🔄 ALTERNAR TECLADO (CELULAR / WHATS)</button>
+    
+    <textarea id="input" placeholder="Digite sua mensagem..."></textarea>
+    
+    <div class="btns">
+        <button class="btn-encode" onclick="process(true)">Criptografar ▼</button>
+        <button class="btn-decode" onclick="process(false)">Descriptografar ▲</button>
+    </div>
+
+    <textarea id="output" readonly placeholder="Resultado..."></textarea>
+    
+    <div class="btns">
+        <button style="background:#34b7f1; color:white;" onclick="copy()">COPIAR</button>
+        <button style="background:#e74c3c; color:white;" onclick="document.getElementById('input').value='';document.getElementById('output').value=''">LIMPAR</button>
+    </div>
+
+    <button class="btn-advanced" onclick="irAvancado()">🚀 IR PARA CRIPTOGRAFIA AVANÇADA</button>
+
+    <div id="tabelaDic" class="dic"></div>
+</div>
+
+<script>
+    const alfabeto = "abcdefghijklmnopqrstuvwxyz".split('');
+    
+    // Sequências diferentes
+    const seqWhats = ["😀","😃","😄","😁","😆","😅","😂","🤣","☺️","😊","😇","🙂","🙃","😉","😌","😍","🥰","😘","😗","😙","😚","😋","😛","😝","😜","🤪"];
+    const seqCelular = ["😀","😃","😄","😁","😆","🥹","😅","😂","🤣","🥲","☺️","😊","😇","🙂","🙃","😉","😌","😍","🥰","😘","😗","😙","😚","😋","😛","😝"];
+    
+    let tecladoAtual = seqWhats;
+    let modoWhats = true;
+
+    // Mapas de tradução
+    let mapaEncode = {};
+    let mapaDecode = {};
+
+    function atualizarMapas() {
+        mapaEncode = {};
+        mapaDecode = {};
+        alfabeto.forEach((letra, i) => {
+            mapaEncode[letra] = tecladoAtual[i] || "❓";
+            mapaDecode[tecladoAtual[i]] = letra;
+        });
+        gerarTabela();
+    }
+
+    function toggleKeyboard() {
+        modoWhats = !modoWhats;
+        tecladoAtual = modoWhats ? seqWhats : seqCelular;
+        document.getElementById('statusModo').innerText = `Modo: ${modoWhats ? 'Teclado WhatsApp' : 'Teclado Celular'}`;
+        atualizarMapas();
+    }
+
+    function normalizar(t) {
+        return t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    }
+
+    function process(encode) {
+        const input = document.getElementById('input').value;
+        const out = document.getElementById('output');
+        
+        if (encode) {
+            const texto = normalizar(input);
+            out.value = texto.split('').map(char => mapaEncode[char] || char).join('');
+        } else {
+            const emojisNoTexto = Array.from(input);
+            out.value = emojisNoTexto.map(emoji => mapaDecode[emoji] || emoji).join('');
+        }
+    }
+
+    function gerarTabela() {
+        const container = document.getElementById('tabelaDic');
+        container.innerHTML = ""; // Limpa antes de gerar nova
+        alfabeto.forEach((letra, i) => {
+            container.innerHTML += `
+                <div class="dic-item">
+                    <span class="letra-v">${letra.toUpperCase()}</span>
+                    <span class="emoji-v">${tecladoAtual[i] || ""}</span>
+                    <span class="indice-v">${i + 1}</span>
+                </div>`;
+        });
+    }
+
+    function copy() {
+        const out = document.getElementById('output');
+        if(!out.value) return;
+        out.select();
+        document.execCommand('copy');
+        alert("Copiado!");
+    }
+
+    function irAvancado() {
+        window.location.href = "avancado.html";
+    }
+
+    // Inicialização
+    atualizarMapas();
+</script>
+</body>
+</html>
